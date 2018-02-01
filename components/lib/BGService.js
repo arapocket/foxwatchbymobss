@@ -11,7 +11,6 @@ import EventEmitter from 'EventEmitter';
 import DeviceInfo from 'react-native-device-info';
 
 const STORAGE_KEY = "@TSLocationManager:";
-import { defaultListenerUrl, companyToken }  from '../consoleConfig';
 
 // react-native-device-info
 let deviceInfo = {
@@ -207,11 +206,10 @@ class BGService {
             state.foregroundService = true;
             state.autoSync = true;
             state.stopOnTerminate = false;
-            state.url = defaultListenerUrl;
             state.startOnBoot = true;
             state.heartbeatInterval = 60;
             state.distanceFilter = 3;
-            state.params = {device: deviceInfo, company_token: companyToken, test: '1'};
+            state.params = {device: deviceInfo, test: '1'};
             this.state = state;
             callback(state);
           });
@@ -225,11 +223,10 @@ class BGService {
                         state.foregroundService = true;
                         state.autoSync = true;
                         state.stopOnTerminate = false;
-                        state.url = defaultListenerUrl;
                         state.startOnBoot = true;
                         state.heartbeatInterval = 60;
                         state.distanceFilter = 3;
-                        state.params = {device: deviceInfo, company_token: companyToken, test: '1'};
+                        state.params = {device: deviceInfo, test: '1'};
                         this.state = state;
                         callback(state);
 
