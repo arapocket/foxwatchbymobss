@@ -16,6 +16,7 @@
     "react-native-device-info": "^0.14.0",
     "react-native-event-listeners": "^1.0.3",
     "react-native-maps": "^0.19.0",
+    "react-native-modalbox": "^1.4.2",
     "react-native-navigation": "^1.1.362",
     "react-native-push-notification": "^3.0.2",
     "react-native-root-toast": "^3.0.1",
