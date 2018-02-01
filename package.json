@@ -12,6 +12,7 @@
     "react": "16.2.0",
     "react-native": "0.52.2",
     "react-native-action-button": "^2.8.4",
+    "react-native-aws3": "0.0.8",
     "react-native-background-geolocation": "^2.10.1",
     "react-native-device-info": "^0.14.0",
     "react-native-event-listeners": "^1.0.3",
