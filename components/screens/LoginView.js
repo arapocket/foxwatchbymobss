@@ -4,9 +4,9 @@ import { Text } from 'react-native';
 import { Button, Card, CardSection, Input, Spinner } from '../common';
 
 // import AuthService from '../lib/AuthService';
-// import IDService from '../lib/IDService';
+import IDService from '../lib/IDService';
 
-// import { EventRegister } from 'react-native-event-listeners'
+import { EventRegister } from 'react-native-event-listeners'
 
 class LoginView extends React.Component {
 
@@ -18,7 +18,7 @@ class LoginView extends React.Component {
     authData: {}
  };
 
-//  this.idService = IDService.getInstance();
+ this.idService = IDService.getInstance();
 //  this.authService = AuthService.getInstance();
 
 
@@ -29,10 +29,7 @@ class LoginView extends React.Component {
 
   componentDidMount(){
 
-    // this.logoutListener = EventRegister.addEventListener('log out', (data) => {
 
-    //   this.setState({loggedIn: false})
-    // })
   }
 
   onButtonPress() {
@@ -61,33 +58,33 @@ class LoginView extends React.Component {
 
       console.log('sucess');
 
-      // EventRegister.emit('log in', 'it works!!!');
+      EventRegister.emit('log in', 'it works!!!');
 
-      // this.idService.setCurrentGuard(username);
+      this.idService.setCurrentGuard(username);
 
       this.onLoginSuccess();
   
-      // this.props.navigator.push({
-      //   screen: 'foxwatch.HomeView', // unique ID registered with Navigation.registerScreen
-      //   title: '🦊', // navigation bar title of the pushed screen (optional)
-      //   passProps: {}, // Object that will be passed as props to the pushed screen (optional)
-      //   animated: true, // does the push have transition animation or does it happen immediately (optional)
-      //   animationType: 'fade', // 'fade' (for both) / 'slide-horizontal' (for android) does the push have different transition animation (optional)
-      //   backButtonTitle: undefined, // override the back button title (optional)
-      //   backButtonHidden: true, // hide the back button altogether (optional)
-      //   navigatorStyle: {}, // override the navigator style for the pushed screen (optional)
-      //   navigatorButtons: {}, // override the nav buttons for the pushed screen (optional)
-      //   // enable peek and pop - commited screen will have `isPreview` prop set as true.
-      //   previewView: undefined, // react ref or node id (optional)
-      //   previewHeight: undefined, // set preview height, defaults to full height (optional)
-      //   previewCommit: true, // commit to push preview controller to the navigation stack (optional)
-      //   previewActions: [{ // action presses can be detected with the `PreviewActionPress` event on the commited screen.
-      //     id: '', // action id (required)
-      //     title: '', // action title (required)
-      //     style: undefined, // 'selected' or 'destructive' (optional)
-      //     actions: [], // list of sub-actions
-      //   }],
-      // });
+      this.props.navigator.push({
+        screen: 'foxwatch.HomeView', // unique ID registered with Navigation.registerScreen
+        title: '🦊', // navigation bar title of the pushed screen (optional)
+        passProps: {}, // Object that will be passed as props to the pushed screen (optional)
+        animated: true, // does the push have transition animation or does it happen immediately (optional)
+        animationType: 'fade', // 'fade' (for both) / 'slide-horizontal' (for android) does the push have different transition animation (optional)
+        backButtonTitle: undefined, // override the back button title (optional)
+        backButtonHidden: true, // hide the back button altogether (optional)
+        navigatorStyle: {}, // override the navigator style for the pushed screen (optional)
+        navigatorButtons: {}, // override the nav buttons for the pushed screen (optional)
+        // enable peek and pop - commited screen will have `isPreview` prop set as true.
+        previewView: undefined, // react ref or node id (optional)
+        previewHeight: undefined, // set preview height, defaults to full height (optional)
+        previewCommit: true, // commit to push preview controller to the navigation stack (optional)
+        previewActions: [{ // action presses can be detected with the `PreviewActionPress` event on the commited screen.
+          id: '', // action id (required)
+          title: '', // action title (required)
+          style: undefined, // 'selected' or 'destructive' (optional)
+          actions: [], // list of sub-actions
+        }],
+      });
     }  else {
       this.onLoginFail();
     }
