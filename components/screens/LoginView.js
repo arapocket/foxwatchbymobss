@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 
 import { Button, Card, CardSection, Input, Spinner } from '../common';
 
-// import AuthService from '../lib/AuthService';
+import AuthService from '../lib/AuthService';
 import IDService from '../lib/IDService';
 
 import { EventRegister } from 'react-native-event-listeners'
@@ -19,7 +19,7 @@ class LoginView extends React.Component {
  };
 
  this.idService = IDService.getInstance();
-//  this.authService = AuthService.getInstance();
+ this.authService = AuthService.getInstance();
 
 
   }
