@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -74,6 +73,7 @@
 		F2F3B247046F471DB9FA6FD1 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B848D7889F0046618156C242 /* EvilIcons.ttf */; };
 		F3CF87024EAC4F768F942B3D /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5E1F52599A5C4926A708C7F6 /* Octicons.ttf */; };
 		F6B16977F1B6462FA9E64320 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AED819FCF244BA3AB98AF45 /* libz.tbd */; };
+		CC32DAC541834F2C83A4C4CB /* libRCTCamera.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5850BAC976B44E84A78191A4 /* libRCTCamera.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -563,6 +563,8 @@
 		F6CA80F558344737807B4D0B /* libRNDeviceInfo-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNDeviceInfo-tvOS.a"; sourceTree = "<group>"; };
 		FE03651888054D2B87B00AE9 /* libRNDeviceInfo.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNDeviceInfo.a; sourceTree = "<group>"; };
 		FF132BEE585F4B6E824F25DB /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Entypo.ttf"; sourceTree = "<group>"; };
+		2AF94BF327EA47D5BBE83AE3 /* RCTCamera.xcodeproj */ = {isa = PBXFileReference; name = "RCTCamera.xcodeproj"; path = "../node_modules/react-native-camera/ios/RCTCamera.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		5850BAC976B44E84A78191A4 /* libRCTCamera.a */ = {isa = PBXFileReference; name = "libRCTCamera.a"; path = "libRCTCamera.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -604,6 +606,7 @@
 				5BD33780698D4A89ADD59E01 /* libRNDeviceInfo.a in Frameworks */,
 				EFA14A9E7E32464688CABD09 /* libRNDeviceInfo-tvOS.a in Frameworks */,
 				DB1A214EDEE6425B9BA810BA /* libRCTVideo.a in Frameworks */,
+				CC32DAC541834F2C83A4C4CB /* libRCTCamera.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -832,6 +835,7 @@
 				0590183699E74EDBA8BDF669 /* RNSpinkit.xcodeproj */,
 				3F0CCB78883344A38778E5A6 /* RNDeviceInfo.xcodeproj */,
 				0F397B1B72B144FBB519966D /* RCTVideo.xcodeproj */,
+				2AF94BF327EA47D5BBE83AE3 /* RCTCamera.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1757,12 +1761,14 @@
 					"$(SRCROOT)/../node_modules/react-native-spinkit/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-device-info/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-video/ios",
+					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 				);
 				INFOPLIST_FILE = foxwatchTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1799,12 +1805,14 @@
 					"$(SRCROOT)/../node_modules/react-native-spinkit/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-device-info/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-video/ios",
+					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 				);
 				INFOPLIST_FILE = foxwatchTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1843,6 +1851,7 @@
 					"$(SRCROOT)/../node_modules/react-native-spinkit/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-device-info/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-video/ios",
+					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 				);
 				INFOPLIST_FILE = foxwatch/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1876,6 +1885,7 @@
 					"$(SRCROOT)/../node_modules/react-native-spinkit/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-device-info/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-video/ios",
+					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 				);
 				INFOPLIST_FILE = foxwatch/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1915,11 +1925,13 @@
 					"$(SRCROOT)/../node_modules/react-native-spinkit/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-device-info/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-video/ios",
+					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 				);
 				INFOPLIST_FILE = "foxwatch-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1966,11 +1978,13 @@
 					"$(SRCROOT)/../node_modules/react-native-spinkit/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-device-info/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-video/ios",
+					"$(SRCROOT)/../node_modules/react-native-camera/ios/**",
 				);
 				INFOPLIST_FILE = "foxwatch-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -2015,6 +2029,7 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.foxwatch-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -2039,6 +2054,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
