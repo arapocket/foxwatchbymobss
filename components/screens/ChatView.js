@@ -90,14 +90,11 @@ class ChatView extends React.Component {
 
   renderMessages() {
 
+    let messages = this.authService.getMessages();
 
 
-
-    console.log('logging patrolData messages inside renderMessages');
-    console.log(this.state.patrolData.messages);
-
-    if (this.state.patrolData.messages != undefined) {
-      return this.state.patrolData.messages.map(msg =>
+    if (messages.length > 0) {
+      return messages.map(msg =>
         <Text key={this.createMessageKey()} style={styles.messages} >
           {msg.user} : {msg.msg}
         </Text>)
@@ -187,6 +184,7 @@ class ChatView extends React.Component {
               multiline={true}
               onChangeText={(text) => this.setState({ message: text })}
               value={this.state.message}
+              autoGrow = {true}
 
             />
 

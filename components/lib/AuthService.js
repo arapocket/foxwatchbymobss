@@ -19,7 +19,7 @@ import PatrolService from '../lib/PatrolService';
 
 
 import io from 'socket.io-client';
-const socket = io('http://ec2-34-210-155-178.us-west-2.compute.amazonaws.com:3000');
+const socket = {};
 
 
 
@@ -43,8 +43,9 @@ class AuthService extends React.Component {
     this.state = {
       authorized: false,
       enabled: false,
-      coordSeq: 1, 
-      idData: {}
+      coordSeq: 1,
+      idData: {},
+      messages: []
     };
 
     this.idService = IDService.getInstance();
@@ -140,53 +141,53 @@ class AuthService extends React.Component {
 
     PushNotification.configure({
 
-        onRegister: function (token) {
-            console.log('TOKEN:', token);
-            self.putDeviceToken(token);
-        },
-        onNotification: function (notification) {
-            console.log('NOTIFICATION:', notification);
-            // notification.finish(PushNotificationIOS.FetchResult.NoData);
+      onRegister: function (token) {
+        console.log('TOKEN:', token);
+        self.putDeviceToken(token);
+      },
+      onNotification: function (notification) {
+        console.log('NOTIFICATION:', notification);
+        // notification.finish(PushNotificationIOS.FetchResult.NoData);
 
-        },
+      },
 
     })
-}
+  }
 
-putDeviceToken(token) {
+  putDeviceToken(token) {
 
     var deviceToken = JSON.stringify(token.token).replace(/"/g, '');
 
 
     fetch('http://ec2-34-210-155-178.us-west-2.compute.amazonaws.com:3000/addDeviceToken', {
-        method: 'PUT',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            GuardID: this.idService.getCurrentGuardID(),
-            DeviceToken: deviceToken
-        })
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        GuardID: this.idService.getCurrentGuardID(),
+        DeviceToken: deviceToken
+      })
     }).then((response) => {
-        console.log("logging putDeviceToken response");
-        console.log(response);
+      console.log("logging putDeviceToken response");
+      console.log(response);
     })
-}
+  }
 
-getIDData() {
+  getIDData() {
     this.idService.getState((state) => {
-        // console.log('idService.getState being called from patrolService');
-        // console.log(state);
-        this.set('idData', state);
-        // console.log('ok now we log this state again');
-        // console.log(this.state);
-        this._saveState();
+      // console.log('idService.getState being called from patrolService');
+      // console.log(state);
+      this.set('idData', state);
+      // console.log('ok now we log this state again');
+      // console.log(this.state);
+      this._saveState();
     });
-}
+  }
 
 
-connectToSocket() {
+  connectToSocket() {
 
     this.getIDData();
 
@@ -200,70 +201,86 @@ connectToSocket() {
     var self = this;
 
     socket.on('connect', function () {
-        // console.log('connected!');
-        // console.log(state);
-        socket.emit('add user', state.idData.currentGuardFirstName);
-        self.set('messages', [])
+      // console.log('connected!');
+      // console.log(state);
+      socket.emit('add user', state.idData.currentGuardFirstName);
+      self.set('messages', [])
     });
 
     socket.on('user joined', (user) => {
-        console.log(user);
-        this.toast(user.username + ' joined.');  
+      console.log(user);
+      this.toast(user.username + ' joined.');
     })
 
     socket.on('message', (msg) => {
 
-        var user = JSON.stringify(msg.username).replace(/"/g, '');
-        msg = JSON.stringify(msg.message).replace(/"/g, '');
-        this.toast(user + ': "' + msg + '"');
-        this.set('messages', [...this.state.messages, {
-            user: user,
-            msg: msg
-        }])
+      var user = JSON.stringify(msg.username).replace(/"/g, '');
+      msg = JSON.stringify(msg.message).replace(/"/g, '');
+      this.toast(user + ': "' + msg + '"');
+      this.set('messages', [...this.state.messages, {
+        user: user,
+        msg: msg
+      }])
 
-        EventRegister.emit('incoming chat', 'it works!!!')
+      EventRegister.emit('incoming chat', 'it works!!!')
     });
 
 
-    socket.on('patrol stop', (id)=> {
-        console.log('stop was heard from GREYFOX. The ID was ' + id.id);
-        EventRegister.emit('patrol stop', id);
+    socket.on('patrol stop', (id) => {
+      console.log('stop was heard from GREYFOX. The ID was ' + id.id);
+      EventRegister.emit('patrol stop', id);
     })
 
-}
+    socket.on('user left', function (user) {
+      console.log('socket.on userleft called');
+      self.toast(user.username + ' left.');
+      
+    });
 
-emitMessage(msg) {
-    socket.emit('message', msg);
-    console.log('emitMessage called ');
-    console.log(msg);
+  }
 
-    var user = this.state.idData.currentGuardFirstName;
-    this.set('messages', [...this.state.messages, {
+  emitMessage(msg) {
+
+    if (this.state.enabled) {
+      socket.emit('message', msg);
+      console.log('emitMessage called ');
+      console.log(msg);
+
+      var user = this.state.idData.currentGuardFirstName;
+      this.set('messages', [...this.state.messages, {
         user: user,
         msg: msg
-    }])
+      }])
 
-    EventRegister.emit('incoming chat', 'it works!!!')
+      EventRegister.emit('incoming chat', 'it works!!!')
+
+    } else {
+      this.set('messages', [...this.state.messages, {
+        user: 'FoxWatch App',
+        msg: 'Only guards on patrols may send messages. '
+      }])
+      EventRegister.emit('incoming chat', 'it works!!!')
+    }
 
 
-}
+  }
 
-disconnectSocket() {
+  disconnectSocket() {
     socket.disconnect();
-}
+  }
 
-toast(message, param, duration) {
+  toast(message, param, duration) {
     duration = duration || 'LONG';
     // Add a Toast on screen.
     let toast = Toast.show(message, {
-        duration: Toast.durations[duration.toUpperCase()],
-        position: Toast.positions.CENTER,
-        shadow: true,
-        animation: true,
-        hideOnPress: true,
-        delay: 0
+      duration: Toast.durations[duration.toUpperCase()],
+      position: Toast.positions.CENTER,
+      shadow: true,
+      animation: true,
+      hideOnPress: true,
+      delay: 0
     });
-}
+  }
 
 
   guardPut(loggedIn) {
@@ -343,8 +360,8 @@ toast(message, param, duration) {
         CurrentCoord: 0
       })
     }).then((response) => {
-       console.log("logging coordPut response");
-       console.log(response);
+      console.log("logging coordPut response");
+      console.log(response);
 
     })
   }
@@ -366,7 +383,7 @@ toast(message, param, duration) {
       })
     }).then((response) => {
       console.log("logging coordPut(location) response");
-       console.log(response);
+      console.log(response);
       this.coordPost(location);
 
     })
@@ -401,15 +418,24 @@ toast(message, param, duration) {
 
 
   incrementCoordSequence() {
-console.log('incrementCoordSequence called');
-console.log('logging state: ' + JSON.stringify(this.state));
-console.log('coordSeq: ' + this.state.coordSeq);
+    console.log('incrementCoordSequence called');
+    console.log('logging state: ' + JSON.stringify(this.state));
+    console.log('coordSeq: ' + this.state.coordSeq);
 
     let coordSeq = this.state.coordSeq;
     coordSeq += 1;
     this.set('coordSeq', coordSeq);
   }
 
+
+  ////GET FUNCTIONS FOR THIS STATE'S PROPERTIES
+
+getMessages(){
+  return this.state.messages;
 }
+
+}
+
+
 
 module.exports = AuthService;
