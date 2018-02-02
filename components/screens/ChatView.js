@@ -176,7 +176,6 @@ class ChatView extends React.Component {
             <TextInput style={styles.textInput}
               {...this.props} // Inherit any props passed to it; e.g., multiline, numberOfLines below
               editable={true}
-              maxLength={40}
               autoCapitalize='sentences'
               placeholder='Enter a message.'
               placeholderTextColor={Config.colors.grey}
