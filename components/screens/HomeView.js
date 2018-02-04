@@ -910,13 +910,17 @@ class HomeView extends React.Component {
 
   incidentButton() {
 
-    let button = <Icon.Button onPress={this.onPressIncidentButton} name="md-paper" color="#000" backgroundColor={Config.colors.orange} underlayColor="transparent" size={22} style={[styles.incidentButton]} iconStyle={{ marginRight: 0 }} padding={10} marginRight={10} />
+    if (this.authService.isEnabled()){
+      let button = <Icon.Button onPress={this.onPressIncidentButton} name="md-paper" color="#000" backgroundColor={Config.colors.orange} underlayColor="transparent" size={22} style={[styles.incidentButton]} iconStyle={{ marginRight: 0 }} padding={10} marginRight={10} />
 
-    return (
-      <View >
-        {button}
-      </View>
-    );
+      return (
+        <View >
+          {button}
+        </View>
+      );
+    }
+    
+
   }
 
   onPressIncidentButton() {
@@ -932,13 +936,17 @@ class HomeView extends React.Component {
 
   chatButton() {
 
-    let button = <Icon.Button onPress={this.onPressChatButton} name="ios-chatbubbles" color="#000" backgroundColor={Config.colors.orange} underlayColor="transparent" size={22} style={[styles.incidentButton]} iconStyle={{ marginRight: 0 }} padding={10} marginRight={10} />
+    if (this.authService.isEnabled()){
+      let button = <Icon.Button onPress={this.onPressChatButton} name="ios-chatbubbles" color="#000" backgroundColor={Config.colors.orange} underlayColor="transparent" size={22} style={[styles.incidentButton]} iconStyle={{ marginRight: 0 }} padding={10} marginRight={10} />
 
-    return (
-      <View >
-        {button}
-      </View>
-    );
+      return (
+        <View >
+          {button}
+        </View>
+      );
+    }
+
+
   }
 
   onPressChatButton() {
