@@ -7,7 +7,8 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   TextInput,
-  Image} from 'react-native';
+  Image
+} from 'react-native';
 
 
 import {
@@ -31,6 +32,7 @@ import Button from 'apsl-react-native-button'
 import CameraView from './CameraView'
 import VideoView from './VideoView'
 import PatrolService from '../lib/PatrolService';
+import AuthService from '../lib/AuthService';
 import BGService from '../lib/BGService';
 import IDService from '../lib/IDService';
 
@@ -58,6 +60,7 @@ class IncidentView extends React.Component {
     this.bgService = BGService.getInstance();
     this.patrolService = PatrolService.getInstance();
     this.idService = IDService.getInstance();
+    this.authService = AuthService.getInstance();
 
     // Default state
     this.state = {
@@ -92,6 +95,7 @@ class IncidentView extends React.Component {
       });
 
     });
+
 
   }
 
@@ -267,12 +271,9 @@ class IncidentView extends React.Component {
 
     var incidentType = this.state.checkListOption;
 
-    if (incidentType == ''){
+    if (incidentType == '') {
       incidentType = 'Other'
     }
-
-    console.log('logging description inside onPressSubmitButton');
-    console.log(description);
 
     fetch('http://ec2-34-210-155-178.us-west-2.compute.amazonaws.com:3000/incidents', {
       method: 'POST',
@@ -295,12 +296,10 @@ class IncidentView extends React.Component {
       this.props.navigator.dismissModal({
         animationType: 'slide-down' // 'none' / 'slide-down' , dismiss animation for the modal (optional, default 'slide-down')
       });
-
-
-        this.uploadMedia();
-      
-
-      
+      this.uploadMedia();
+    }).catch((err) => {
+      console.log(err);
+      this.authService.toast("The incident was not sent. Please check your connection and try again.")
     })
 
   }
@@ -314,20 +313,20 @@ class IncidentView extends React.Component {
 
     if (mediaPath != undefined && mediaPath != '' && mediaPath != null) {
 
-      if (mediaPath.includes('.mov')){
+      if (mediaPath.includes('.mov')) {
 
         console.log('yes it includes .mov');
 
-        var media = <Video style={styles.incidentMedia} source={{uri: mediaPath}} volume={1.0} repeat={true}  />
+        var media = <Video style={styles.incidentMedia} source={{ uri: mediaPath }} volume={1.0} repeat={true} />
 
         // console.log('logging the video media');
         // console.log(media);
 
-      }else {
-      var media = <Image style={styles.incidentMedia} source={{ uri: mediaPath }} />
+      } else {
+        var media = <Image style={styles.incidentMedia} source={{ uri: mediaPath }} />
 
-      // console.log('logging the image media');
-      // console.log(media);
+        // console.log('logging the image media');
+        // console.log(media);
 
       }
 
@@ -347,39 +346,29 @@ class IncidentView extends React.Component {
     );
   }
 
-  uploadMedia(){
+  uploadMedia() {
     var fileName = this.state.idData.currentIncidentID;
     this.fetchPresignUrl(fileName);
 
   }
 
   fetchPresignUrl(fileName) {
-    // console.log('logging filename inside fetchPresignUrl');
-    // console.log(fileName);
-
-    // fetch('http://ec2-34-210-155-178.us-west-2.compute.amazonaws.com:8080/getPreSignUrl?fileName=' + fileName)
-    //   .then(res => {
-    //     console.log('logging the presignUrl we got back');
-    //     console.log(res.text());
-    //     this.sendFile(fileName, res.text());
-    //   });
-
 
     var xhr = new XMLHttpRequest();
 
     var self = this;
 
     xhr.onreadystatechange = function () {
-        if (xhr.readyState == XMLHttpRequest.DONE) {
-            // alert(xhr.responseText);
-            var res = xhr.responseText;
-            // console.log('logging the xhr shit');
-            // console.log(res);
-            self.sendFile(fileName, res);
-        }
+      if (xhr.readyState == XMLHttpRequest.DONE) {
+        // alert(xhr.responseText);
+        var res = xhr.responseText;
+        // console.log('logging the xhr shit');
+        // console.log(res);
+        self.sendFile(fileName, res);
+      }
     }
 
-    
+
     xhr.open("GET", 'http://ec2-34-210-155-178.us-west-2.compute.amazonaws.com:8080/getPreSignUrl?fileName=' + fileName, true);
 
     xhr.setRequestHeader('Content-Type', 'application/json');
@@ -387,27 +376,17 @@ class IncidentView extends React.Component {
 
   }
 
-  sendFile(fileName, presignedUrl){
-    var filePath = 'file://' + this.state.patrolData.mediaPath;
+  sendFile(fileName, presignedUrl) {
 
-    // if (filePath.contains('.mov')){
-    //   var fileType = 'media/mov';
-    // } else {
-    //   var fileType = 'media/jpeg';
-    // }
+    console.log('logging media path inside sendFile()');
+    if (this.patrolService.getMediaPath() != '') {
 
+      var filePath = 'file://' + this.patrolService.getMediaPath();
 
-    var fileType = 'media/jpeg';
-    
-    if (filePath != '' ){
-      // console.log('logging filePath inside sendFile');
-      // console.log(filePath);
-  
-      // console.log('logging presignedUrl inside sendFile');
-      // console.log(presignedUrl);
-  
+      var fileType = 'media/jpeg';
+
       var xhr = new XMLHttpRequest();
-      xhr.onreadystatechange = function() {
+      xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
           if (xhr.status === 200) {
             console.log('Successfully uploaded the file')
@@ -417,12 +396,15 @@ class IncidentView extends React.Component {
         }
       }
       xhr.open('PUT', presignedUrl)
-      xhr.send({ 
-        uri: filePath, type: fileType, name: fileName });
+      xhr.send({
+        uri: filePath, type: fileType, name: fileName
+      });
+
     }
 
 
-    
+
+
   }
 
   render() {
@@ -478,7 +460,7 @@ class IncidentView extends React.Component {
               placeholderTextColor={Config.colors.grey}
               selectTextOnFocus={true}
               multiline={true}
-              onChangeText={(text) => this.setState({description: text})}
+              onChangeText={(text) => this.setState({ description: text })}
 
             />
 

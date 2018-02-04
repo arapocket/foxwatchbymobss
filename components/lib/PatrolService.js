@@ -141,6 +141,10 @@ class PatrolService extends React.Component {
         this.set("mediaPath", path)
     }
 
+    getMediaPath(){
+        return this.state.mediaPath;
+    }
+
 
 
 
