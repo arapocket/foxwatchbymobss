@@ -30,7 +30,6 @@ import AuthService from '../lib/AuthService';
 import Config from '../config';
 import commonStyles from '../styles';
 import BottomToolbarView from '../BottomToolbarView';
-import GeofenceView from './GeofenceView';
 import IncidentView from './IncidentView'
 import ChatView from './ChatView'
 
@@ -48,10 +47,6 @@ const LONGITUDE_DELTA = 0.000001;
 
 const STATIONARY_REGION_FILL_COLOR = "rgba(200,0,0,0.2)"
 const STATIONARY_REGION_STROKE_COLOR = "rgba(200,0,0,0.2)"
-const GEOFENCE_STROKE_COLOR = "rgba(17,183,0,0.5)"
-const GEOFENCE_FILL_COLOR = "rgba(17,183,0,0.2)"
-const GEOFENCE_STROKE_COLOR_ACTIVATED = "rgba(127,127,127,0.5)";
-const GEOFENCE_FILL_COLOR_ACTIVATED = "rgba(127,127,127, 0.2)";
 const POLYLINE_STROKE_COLOR = "rgba(32,64,255,0.6)";
 
 let eventEmitter = new EventEmitter();
@@ -94,9 +89,6 @@ class HomeView extends React.Component {
       markers: [],
       routeMarkers: [],
       stopZones: [],
-      geofences: [],
-      geofencesHit: [],
-      geofencesHitEvents: [],
       coordinates: [],
       checkpoints: [],
       bgGeo: {},
@@ -142,7 +134,6 @@ class HomeView extends React.Component {
         });
       });
 
-      // ARA NOTES
       // POST GUARD HERE
       this.authService.guardPut(1);
       this.loadCurrentRoutes();
@@ -318,42 +309,38 @@ class HomeView extends React.Component {
       this.patrolService.resetState();
       this.loadCurrentRoutes();
 
-      if (this.bgService.isLocationTrackingMode()) {
-        // Location tracking mode
-        bgGeo.start((state) => {
-          this.setState({ isResettingOdometer: true, odometer: '0.0' });
-          this.bgService.setOdometer(0, () => {
-            this.setState({ isResettingOdometer: false });
-          }, (error) => {
-            this.setState({ isResettingOdometer: false });
+      bgGeo.start((state) => {
+        this.setState({ isResettingOdometer: true, odometer: '0.0' });
+        this.bgService.setOdometer(0, () => {
+          this.setState({ isResettingOdometer: false });
+        }, (error) => {
+          this.setState({ isResettingOdometer: false });
+        });
+        this.setState({ showsUserLocation: true });
+        //  console.log('- Start success: ', state);
+
+        bgGeo.changePace(true, (state) => {
+
+        }, (error) => {
+          console.info("Failed to changePace: ", error);
+          this.setState({
+            isChangingPace: false,
+            isMoving: false // <-- reset state back
           });
-          this.setState({ showsUserLocation: true });
-          //  console.log('- Start success: ', state);
         });
-      } else {
-        // Geofences-only mode
-        bgGeo.startGeofences((state) => {
-          //  console.log('- Start geofences: ', state);
-        });
-      }
 
-
-      
-
+      });
 
     } else {
-      
-this.authService.resetState();
+      this.setState({ showsUserLocation: false });
+      this.authService.resetState();
 
       bgGeo.stop(() => {
         //  console.log('- stopped');
       });
-
-      // Clear markers, polyline, geofences, stationary-region
       this.setState({
         coordinates: [],
         markers: [],
-        geofences: [],
         stationaryRadius: 0,
         stationaryLocation: {
           timestamp: '',
@@ -361,8 +348,6 @@ this.authService.resetState();
           longitude: 0
         },
         stopZones: [],
-        geofencesHit: [],
-        geofencesHitEvents: []
       });
     }
 
@@ -383,27 +368,21 @@ this.authService.resetState();
     // location event
     this.onLocation = this.onLocation.bind(this);
     this.onHttp = this.onHttp.bind(this);
-    this.onGeofence = this.onGeofence.bind(this);
     this.onHeartbeat = this.onHeartbeat.bind(this);
     this.onError = this.onError.bind(this);
     this.onMotionChange = this.onMotionChange.bind(this);
     this.onSchedule = this.onSchedule.bind(this);
-    this.onGeofencesChange = this.onGeofencesChange.bind(this);
     this.onPowerSaveChange = this.onPowerSaveChange.bind(this);
 
     bgGeo.on("location", this.onLocation, this.onError);
     // http event
     bgGeo.on("http", this.onHttp);
-    // geofence event
-    bgGeo.on("geofence", this.onGeofence);
     // heartbeat event
     bgGeo.on("heartbeat", this.onHeartbeat);
     // motionchange event
     bgGeo.on("motionchange", this.onMotionChange);
     // schedule event
     bgGeo.on("schedule", this.onSchedule);
-    // geofenceschange
-    bgGeo.on("geofenceschange", this.onGeofencesChange);
     // powersavechange event
     bgGeo.on("powersavechange", this.onPowerSaveChange);
     ////
@@ -487,14 +466,7 @@ this.authService.resetState();
         }
       });
     } else {
-      this.setState({
-        stationaryRadius: (this.bgService.isLocationTrackingMode()) ? 200 : (this.state.bgGeo.geofenceProximityRadius / 2),
-        stationaryLocation: {
-          timestamp: event.location.timestamp,
-          latitude: event.location.coords.latitude,
-          longitude: event.location.coords.longitude
-        }
-      });
+
     }
 
     this.lastMotionChangeLocation = location;
@@ -564,27 +536,6 @@ this.authService.resetState();
 
   }
 
-  onGeofencesChange(event) {
-    var on = event.on;
-    var off = event.off;
-    var geofences = this.state.geofences;
-
-    // Filter out all "off" geofences.
-    geofences = geofences.filter(function (geofence) {
-      return off.indexOf(geofence.identifier) < 0;
-    });
-
-    // Add new "on" geofences.
-    on.forEach(function (geofence) {
-      var marker = geofences.find(function (m) { return m.identifier === geofence.identifier; });
-      if (marker) { return; }
-      geofences.push(this.createGeofenceMarker(geofence));
-    }.bind(this));
-
-    this.setState({
-      geofences: geofences
-    });
-  }
 
   onPowerSaveChange(isPowerSaveMode) {
     // Show red side-border bars on map when in low-power mode.
@@ -594,10 +545,6 @@ this.authService.resetState();
     });
   }
 
-  onPressGeofence(event) {
-    //  console.log('NOT IMPLEMENTED');
-  }
-
   onHeartbeat(params) {
     //  console.log("- heartbeat: ", params.location);
   }
@@ -605,52 +552,6 @@ this.authService.resetState();
   onHttp(response) {
     //  console.log('- http ' + response.status);
     //  console.log(response.responseText);
-  }
-
-  onGeofence(geofence) {
-    let location = geofence.location;
-    var marker = this.state.geofences.find((m) => {
-      return m.identifier === geofence.identifier;
-    });
-    if (!marker) { return; }
-
-    marker.fillColor = GEOFENCE_STROKE_COLOR_ACTIVATED;
-    marker.strokeColor = GEOFENCE_STROKE_COLOR_ACTIVATED;
-
-    let coords = location.coords;
-
-    let hit = this.state.geofencesHit.find((hit) => {
-      return hit.identifier === geofence.identifier;
-    });
-
-    if (!hit) {
-      hit = {
-        identifier: geofence.identifier,
-        radius: marker.radius,
-        center: {
-          latitude: marker.center.latitude,
-          longitude: marker.center.longitude
-        },
-        events: []
-      };
-      this.setState({
-        geofencesHit: [...this.state.geofencesHit, hit]
-      });
-    }
-    // Get bearing of location relative to geofence center.
-    let bearing = this.bgService.getBearing(marker.center, location.coords);
-    let edgeCoordinate = this.bgService.computeOffsetCoordinate(marker.center, marker.radius, bearing);
-    let event = {
-      coordinates: [
-        edgeCoordinate,
-        { latitude: coords.latitude, longitude: coords.longitude },
-      ],
-      action: geofence.action,
-      key: geofence.identifier + ":" + geofence.action + ":" + location.timestamp
-    };
-    this.setState({
-      geofencesHitEvents: [...this.state.geofencesHitEvents, event]
-    });
   }
 
   onSchedule(state) {
@@ -681,31 +582,12 @@ this.authService.resetState();
     });
   }
 
-  onLongPress(params) {
-    var coordinate = params.nativeEvent.coordinate;
-    this.bgService.playSound('LONG_PRESS_ACTIVATE');
-    // this.geofenceView.open(coordinate);
-  }
-
-  onSubmitGeofence(params) {
-    var bgGeo = this.bgService.getPlugin();
-    this.bgService.playSound('ADD_GEOFENCE');
-    bgGeo.addGeofence(params, (identifier) => {
-      this.setState({
-        geofences: [...this.state.geofences, this.createGeofenceMarker(params)]
-      });
-    }, (error) => {
-      console.warn('- addGeofence error: ', error);
-    });
-  }
 
   clearMarkers() {
     this.setState({
       coordinates: [],
       markers: [],
       stopZones: [],
-      geofencesHit: [],
-      geofencesHitEvents: []
     });
   }
 
@@ -750,19 +632,6 @@ this.authService.resetState();
         latitude: location.lat,
         longitude: location.lng
       }
-    }
-  }
-
-  createGeofenceMarker(geofence) {
-    return {
-      radius: geofence.radius,
-      center: {
-        latitude: geofence.latitude,
-        longitude: geofence.longitude
-      },
-      identifier: geofence.identifier,
-      strokeColor: GEOFENCE_STROKE_COLOR,
-      fillColor: GEOFENCE_FILL_COLOR
     }
   }
 
@@ -823,81 +692,6 @@ this.authService.resetState();
     ));
   }
 
-  renderActiveGeofences() {
-    return this.state.geofences.map((geofence) => (
-      <MapView.Circle
-        key={geofence.identifier}
-        radius={geofence.radius}
-        center={geofence.center}
-        strokeWidth={1}
-        strokeColor={geofence.strokeColor}
-        fillColor={geofence.fillColor}
-        onPress={this.onPressGeofence}
-      />
-    ));
-  }
-
-  renderGeofencesHit() {
-    let rs = [];
-    return this.state.geofencesHit.map((hit) => {
-      return (
-        <MapView.Circle
-          key={"hit:" + hit.identifier}
-          radius={hit.radius + 1}
-          center={hit.center}
-          strokeWidth={1}
-          strokeColor={Config.colors.black}>
-        </MapView.Circle>
-      );
-    });
-  }
-
-  renderGeofencesHitEvents() {
-    return this.state.geofencesHitEvents.map((event) => {
-      let isEnter = (event.action === 'ENTER');
-      let color = undefined;
-      switch (event.action) {
-        case 'ENTER':
-          color = Config.colors.green;
-          break;
-        case 'EXIT':
-          color = Config.colors.red;
-          break;
-        case 'DWELL':
-          color = Config.colors.light_orange;
-          break;
-      }
-      let markerStyle = {
-        backgroundColor: color
-      };
-      return (
-        <View key={event.key}>
-          <MapView.Polyline
-            key="polyline"
-            coordinates={event.coordinates}
-            geodesic={true}
-            strokeColor={Config.colors.black}
-            strokeWidth={1}
-            style={styles.geofenceHitPolyline}
-            zIndex={1}
-            lineCap="square" />
-          <MapView.Marker
-            key="edge_marker"
-            coordinate={event.coordinates[0]}
-            anchor={{ x: 0, y: 0.1 }}>
-            <View style={[styles.geofenceHitMarker, markerStyle]}></View>
-          </MapView.Marker>
-          <MapView.Marker
-            key="location_marker"
-            coordinate={event.coordinates[1]}
-            anchor={{ x: 0, y: 0.1 }}>
-            <View style={styles.markerIcon}></View>
-          </MapView.Marker>
-        </View>
-      );
-    });
-  }
-
   renderSyncButton() {
     return (!this.state.isSyncing) ? (
       <Icon name="ios-cloud-upload" style={styles.actionButtonIcon} size={25} />
@@ -908,7 +702,7 @@ this.authService.resetState();
 
   incidentButton() {
 
-    if (this.authService.isEnabled()){
+    if (this.authService.isEnabled()) {
       let button = <Icon.Button onPress={this.onPressIncidentButton} name="md-paper" color="#000" backgroundColor={Config.colors.orange} underlayColor="transparent" size={22} style={[styles.incidentButton]} iconStyle={{ marginRight: 0 }} padding={10} marginRight={10} />
 
       return (
@@ -917,7 +711,7 @@ this.authService.resetState();
         </View>
       );
     }
-    
+
 
   }
 
@@ -934,7 +728,7 @@ this.authService.resetState();
 
   chatButton() {
 
-    if (this.authService.isEnabled()){
+    if (this.authService.isEnabled()) {
       let button = <Icon.Button onPress={this.onPressChatButton} name="ios-chatbubbles" color="#000" backgroundColor={Config.colors.orange} underlayColor="transparent" size={22} style={[styles.incidentButton]} iconStyle={{ marginRight: 0 }} padding={10} marginRight={10} />
 
       return (
@@ -995,7 +789,6 @@ this.authService.resetState();
           ref="map"
           style={styles.map}
           showsUserLocation={this.state.showsUserLocation}
-          onLongPress={this.onLongPress.bind(this)}
           onRegionChange={this.onRegionChange.bind(this)}
           onPanDrag={this.onMapPanDrag.bind(this)}
           scrollEnabled={this.state.mapScrollEnabled}
@@ -1033,9 +826,6 @@ this.authService.resetState();
           {this.renderStopZoneMarkers()}
           {this.renderMarkers()}
           {this.renderRouteMarkers()}
-          {this.renderActiveGeofences()}
-          {this.renderGeofencesHit()}
-          {this.renderGeofencesHitEvents()}
         </MapView>
 
 
@@ -1109,7 +899,7 @@ var styles = StyleSheet.create({
   markerIcon: {
     borderWidth: 1,
     borderColor: '#000000',
-    backgroundColor: Config.colors.polyline_color,
+    backgroundColor: Config.colors.red,
     width: 10,
     height: 10,
     borderRadius: 5

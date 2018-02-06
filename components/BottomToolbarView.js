@@ -123,8 +123,6 @@ class BottomToolbarView extends React.Component {
   onClickPace() {
     if (!this.state.enabled) { return; }
 
-    this.bgService.playSound('BUTTON_CLICK');
-
     let isMoving = !this.state.isMoving;
     let bgGeo = this.bgService.getPlugin();
 
@@ -161,30 +159,33 @@ class BottomToolbarView extends React.Component {
     });
   }
 
-  getPaceButton() {
+  // getPaceButton() {
 
 
-    if (this.state.enabled) {
-      if (this.state.isMoving) {
-        var icon = Config.icons.pause;
-      } else {
-        var icon = Config.icons.play;
-      }
-    }
+  //   if (this.state.enabled) {
 
-    let button = <Icon.Button
-      onPress={this.onClickPace.bind(this)}
-      name={icon} color={Config.colors.off_white}
-      size={43} backgroundColor="transparent"
-      underlayColor="transparent"
-      iconStyle={{ marginRight: 0 }} />
+  //     if (this.state.isMoving) {
+  //       var icon = Config.icons.pause;
+  //     } else {
+  //       var icon = Config.icons.play;
+  //     }
+  //   }
 
-    return (
-      <View  >
-        {button}
-      </View>
-    );
-  }
+    
+  //         let button = <Icon.Button
+  //     onPress={this.onClickPace.bind(this)}
+  //     name={icon} color={Config.colors.off_white}
+  //     size={43} backgroundColor="transparent"
+  //     underlayColor="transparent"
+  //     iconStyle={{ marginRight: 0 }} />
+
+  //   return (
+  //     <View  >
+  //       {button}
+  //     </View>
+  //   );
+
+  // }
 
 
 
@@ -204,7 +205,6 @@ class BottomToolbarView extends React.Component {
             onPress={() => this.onClickLocate()} />
         </View>
         <View style={styles.paceButton} >
-          {this.getPaceButton()}
         </View>
 
       </View>

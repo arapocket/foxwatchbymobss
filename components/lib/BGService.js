@@ -29,11 +29,10 @@ const SETTINGS = {
     {name: 'desiredAccuracy', group: 'geolocation', dataType: 'integer', inputType: 'select', values: [-1, 0, 10, 100, 1000], defaultValue: 0 },
     {name: 'distanceFilter', group: 'geolocation', dataType: 'integer', inputType: 'select', values: [0, 2, 3, 5, 10, 20, 50, 100, 500], defaultValue: 2 },
     {name: 'disableElasticity', group: 'geolocation', dataType: 'boolean', inputType: 'toggle', values: [true, false], defaultValue: false},
-    {name: 'geofenceProximityRadius', group: 'geolocation', dataType: 'integer', inputType: 'select', values: [1000, 1500, 2000, 5000, 10000, 100000], defaultValue: 1000 },
     {name: 'stopAfterElapsedMinutes', group: 'geolocation', dataType: 'integer', inputType: 'select', values: [-1, 0, 1, 2, 5, 10, 15], defaultValue: 0},
     {name: 'desiredOdometerAccuracy', group: 'geolocation', dataType: 'integer', inputType: 'select', values: [10, 20, 50, 100, 500], defaultValue: 100},
     // Activity Recognition
-    {name: 'activityRecognitionInterval', group: 'activity recognition', dataType: 'integer', inputType: 'select', values: [0, 1000, 5000, 10000, 30000], defaultValue: 10000},
+    {name: 'activityRecognitionInterval', group: 'activity recognition', dataType: 'integer', inputType: 'select', values: [0, 1000, 5000, 10000, 30000], defaultValue: 0},
     {name: 'stopTimeout', group: 'activity recognition', dataType: 'integer', inputType: 'select', values: [0, 1, 5, 10, 15], defaultValue: 1},
     // HTTP & Persistence
     {name: 'url', group: 'http', inputType: 'text', dataType: 'string', defaultValue: 'http://your.server.com/endpoint'},
@@ -54,13 +53,13 @@ const SETTINGS = {
   ],
   ios: [
     // Geolocation
-    {name: 'stationaryRadius', group: 'geolocation', dataType: 'integer', inputType: 'select', values: [0, 25, 50, 100, 500, 1000, 5000], defaultValue: 25 },
-    {name: 'activityType', group: 'geolocation', dataType: 'string', inputType: 'select', values: ['Other', 'AutomotiveNavigation', 'Fitness', 'OtherNavigation'], defaultValue: 'Other'},
+    {name: 'stationaryRadius', group: 'geolocation', dataType: 'integer', inputType: 'select', values: [0, 25, 50, 100, 500, 1000, 5000], defaultValue: 0 },
+    {name: 'activityType', group: 'geolocation', dataType: 'string', inputType: 'select', values: ['Other', 'AutomotiveNavigation', 'Fitness', 'OtherNavigation'], defaultValue: 'Fitness'},
     {name: 'useSignificantChangesOnly', group: 'geolocation', dataType: 'boolean', inputType: 'toggle', values: [true, false], defaultValue: false},
     // Application
-    {name: 'preventSuspend', group: 'application', dataType: 'boolean', inputType: 'toggle', values: [true, false], defaultValue: false},
+    {name: 'preventSuspend', group: 'application', dataType: 'boolean', inputType: 'toggle', values: [true, false], defaultValue: true},
     // Activity Recognition
-    {name: 'disableStopDetection', group: 'activity recognition', dataType: 'boolean', inputType: 'toggle', values: [true, false], defaultValue: false},
+    {name: 'disableStopDetection', group: 'activity recognition', dataType: 'boolean', inputType: 'toggle', values: [true, false], defaultValue: true},
     {name: 'stopDetectionDelay', group: 'activity recognition', dataType: 'integer', inputType: 'select', values: [0, 1, 5, 10, 15], defaultValue: 0}
   ],
   android: [
@@ -74,7 +73,6 @@ const SETTINGS = {
     {name: 'foregroundService', group: 'application', dataType: 'boolean', inputType: 'toggle', values: [true, false], defaultValue: false},
     {name: 'forceReloadOnMotionChange', group: 'application', dataType: 'boolean', inputType: 'toggle', values: [true, false], defaultValue: false},
     {name: 'forceReloadOnLocationChange', group: 'application', dataType: 'boolean', inputType: 'toggle', values: [true, false], defaultValue: false},
-    {name: 'forceReloadOnGeofence', group: 'application', dataType: 'boolean', inputType: 'toggle', values: [true, false], defaultValue: false},
     {name: 'forceReloadOnHeartbeat', group: 'application', dataType: 'boolean', inputType: 'toggle', values: [true, false], defaultValue: false},
     {name: 'notificationPriority', group: 'application', dataType: 'string', inputType: 'select', values: ['DEFAULT', 'HIGH', 'LOW', 'MAX', 'MIN'], defaultValue: 'DEFAULT'}
   ]
@@ -85,7 +83,6 @@ const SOUND_MAP = {
   "ios": {
     "LONG_PRESS_ACTIVATE": 1113,
     "LONG_PRESS_CANCEL": 1075,
-    "ADD_GEOFENCE": 1114,
     "BUTTON_CLICK": 1104,
     "MESSAGE_SENT": 1303,
     "ERROR": 1006,
@@ -96,7 +93,6 @@ const SOUND_MAP = {
   "android": {
     "LONG_PRESS_ACTIVATE": 27,
     "LONG_PRESS_CANCEL": 94,
-    "ADD_GEOFENCE": 28,
     "BUTTON_CLICK": 19,
     "MESSAGE_SENT": 90,
     "ERROR": 89,
@@ -108,7 +104,6 @@ const SOUND_MAP = {
 
 let eventEmitter = new EventEmitter();
 
-let geofenceNextId = 0;
 
 // Singleton instance
 let instance = null;
@@ -251,10 +246,7 @@ class BGService {
           callback(state);
         });
       } else {
-        this.plugin.startGeofences((state) => {
-          this.state = state;
-          callback(state);
-        });
+
       }
     } else {
       let config = {};
@@ -270,6 +262,7 @@ class BGService {
     eventEmitter.emit('change', key, value);
   }
 
+
   /**
   * Listen to config change events
   */
@@ -279,39 +272,6 @@ class BGService {
 
   removeListeners() {
     eventEmitter.removeAllListeners();
-  }
-
-  /**
-  * Load test geofences
-  * @param {String} route name
-  * @param {Function} callback
-  */
-  loadTestGeofences(route, config, callback) {
-    callback = callback || function(){};
-    var data = this.getCityDriveData();
-    var geofences = [];
-    for (var n=0, len=data.length;n<len;n++) {
-      geofences.push({
-        identifier: 'city_drive_' + (++geofenceNextId),
-        extras: {
-          "geofence_extra_foo": "extra geofence data"
-        },
-        latitude: data[n].lat,
-        longitude: data[n].lng,
-        radius: config.radius,
-        notifyOnEntry: config.notifyOnEntry,
-        notifyOnExit: config.notifyOnExit,
-        notifyOnDwell: config.notifyOnDwell,
-        loiteringDelay: config.loiteringDelay
-      });
-    }
-
-    this.plugin.addGeofences(geofences, () => {
-      this.playSound('ADD_GEOFENCE');
-      callback();
-    }, () => {
-      callback();
-    });
   }
 
   setOdometer(value, success, failure) {
@@ -325,13 +285,6 @@ class BGService {
     });
   }
 
-  /**
-  * Clear all geofences
-  */
-  removeGeofences() {
-    this.playSound('MESSAGE_SENT');
-    this.plugin.removeGeofences();
-  }
 
   /**
   * Play a UI sound via BackgroundGeolocation

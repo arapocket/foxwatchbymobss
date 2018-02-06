@@ -49,15 +49,8 @@ class SettingsView extends React.Component {
 
     // Default state
     this.state = {
-      isDestroyingLog: false,
-      isLoadingGeofences: false,
-      geofence: {
-        radius: '200',
-        notifyOnEntry: true,
-        notifyOnExit: false,
-        notifyOnDwell: false,
-        loiteringDelay: '0'
-      }
+      isDestroyingLog: false
+
     };
 
 
@@ -79,7 +72,6 @@ class SettingsView extends React.Component {
       this.setState({
         ...state,
         logLevel: this.decodeLogLevel(state.logLevel),
-        trackingMode: this.decodeTrackingMode(state.trackingMode),
         notificationPriority: this.decodeNotificationPriority(state.notificationPriority)
       });
     });
@@ -97,29 +89,6 @@ class SettingsView extends React.Component {
     });
   }
 
-  onChangeGeofence(setting, value) {
-    this.settingsService.onChange(setting, value);
-    let state = {};
-    state[setting.name] = value;
-    this.setState(state);
-  }
-
-  onClickLoadGeofences() {
-    if (this.state.isLoadingGeofences) { return false; }
-    this.setState({isLoadingGeofences: true});
-
-    this.settingsService.getState((state) => {
-      this.bgService.loadTestGeofences('city_drive', state, () => {
-        this.settingsService.toast('Loaded City Drive geofences');
-        this.setState({isLoadingGeofences: false});
-      });
-    });
-  }
-
-  onClickClearGeofences() {
-    this.bgService.removeGeofences();
-  }
-
   onClickEmailLogs() {
 
   }
@@ -134,25 +103,7 @@ class SettingsView extends React.Component {
     });
   }
 
-  setTrackingMode(trackingMode){
-    this.bgService.playSound('BUTTON_CLICK');
-    this.setState({
-      trackingMode
-    });
-    let bgGeo = this.bgService.getPlugin();
-    if (trackingMode == "location") {
-      bgGeo.start();
-    } else {
-      bgGeo.startGeofences();
-    }
-    if (typeof(this.props.onChange) === 'function') {  // <-- Android
-      this.props.onChange('trackingMode', trackingMode);
-    }
-  }
 
-  decodeTrackingMode(trackingMode) {
-    return (trackingMode === 1 || trackingMode === 'location') ? 'location' : 'geofence';
-  }
 
   decodeLogLevel(logLevel) {
     let value = 'VERBOSE';
@@ -251,33 +202,11 @@ class SettingsView extends React.Component {
     }
     return value;
   }
-
-  setGeofenceProximityRadius(value) {
-    this.bgService.playSound('BUTTON_CLICK');
-    var state = {geofenceProximityRadius: value}
-    this.setState(state);
-    var decodedValue = parseInt(value.match(/[0-9]+/)[0], 10)*1000;
-
-    /*
-    SettingsService.set('geofenceProximityRadius', decodedValue, function(state) {
-      if (typeof(me.props.onChange) === 'function') {  // <-- Android
-        me.props.onChange('geofenceProximityRadius', decodedValue);
-      }
-    });
-    */
-    console.warn('TODO setGeofenceProximityRadius');
-  }
-
   onFormChange() {
 
   }
 
-  onChangeTrackingMode(value) {
-    let bgGeo = this.bgService.getPlugin();
-    if (this.state.trackingMode === value) { return; }
-    this.setState({trackingMode: value});
-    this.bgService.set('trackingMode', value);
-  }
+
 
   onChangeEmail(value) {
     this.settingsService.onChange('email', value);
@@ -371,32 +300,9 @@ class SettingsView extends React.Component {
     return field;
   }
 
-  renderTrackingModeField() {
-    return (
-      <FormItem inlineLabel key="trackingMode" style={styles.formItem}>
-        <Label style={styles.formLabel}>trackingMode</Label>
-        <Right>
-          <Picker
-            mode="dropdown"
-            selectedValue={this.state.trackingMode}
-            onValueChange={this.onChangeTrackingMode.bind(this)}
-            style={{width:(Platform.OS === 'ios') ? undefined : 150}}>
-            <Item label="Location" value="location" />
-            <Item label="Geofence" value="geofence" />
-          </Picker>
-        </Right>
-      </FormItem>
-    );
-  }
   renderPlatformSettings(section) {
     return this.bgService.getPlatformSettings(section).map((setting) => {
       return this.buildField(setting, this.onFieldChange.bind(this));
-    });
-  }
-
-  getGeofenceTestSettings() {
-    return this.settingsService.getSettings('geofence').map((setting) => {
-      return this.buildField(setting, this.onChangeGeofence.bind(this));
     });
   }
 
@@ -434,7 +340,6 @@ class SettingsView extends React.Component {
               <FormItem style={styles.headerItem}>
                 <Text style={styles.header}>GEOLOCATION</Text>
               </FormItem>
-              {this.renderTrackingModeField()}
               {this.renderPlatformSettings('geolocation')}
               <FormItem style={styles.headerItem}>
                 <Text style={styles.header}>ACTIVITY RECOGNITION</Text>
@@ -462,22 +367,14 @@ class SettingsView extends React.Component {
               </View>
 
               <FormItem style={styles.headerItem}>
-                <Text style={styles.header}>GEOFENCE TESTING (Freeway Drive)</Text>
               </FormItem>
               <View style={styles.setting}>
                 <View style={styles.label}>
-                  <Button onPress={this.onClickClearGeofences.bind(this)} activeOpacity={0.7} style={[styles.button, styles.redButton]} textStyle={styles.buttonLabel}>
-                    Clear
-                  </Button>
                 </View>
                 <Text>&nbsp;&nbsp;&nbsp;</Text>
                 <View style={styles.label}>
-                  <Button onPress={this.onClickLoadGeofences.bind(this)} isLoading={this.state.isLoadingGeofences} activeOpacity={0.7} style={[styles.button, styles.blueButton]} textStyle={styles.buttonLabel}>
-                    Load
-                  </Button>
                 </View>
               </View>
-              {this.getGeofenceTestSettings()}
             </Form>
           </Content>
 
