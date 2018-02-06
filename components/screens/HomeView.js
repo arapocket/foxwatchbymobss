@@ -343,10 +343,7 @@ class HomeView extends React.Component {
 
     } else {
       
-      this.authService.disconnectSocket();
-      this.authService.patrolPut();
-      this.authService.coordPut();
-      this.authService.set('coordSeq', 1);
+this.authService.resetState();
 
       bgGeo.stop(() => {
         //  console.log('- stopped');

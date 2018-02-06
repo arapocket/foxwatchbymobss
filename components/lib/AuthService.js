@@ -67,12 +67,7 @@ class AuthService extends React.Component {
 
     this.logoutListener = EventRegister.addEventListener('log out', (data) => {
       console.log('log out heard ');
-      this.set('enabled', false);
-      this.patrolPut();
-      this.coordPut();
-      this.disconnectSocket();
-      this.guardPut(0);
-      this.set('coordSeq', 1);
+      this.resetState();
       this.idService.resetState();
     })
 
@@ -428,6 +423,15 @@ class AuthService extends React.Component {
 
   getMessages() {
     return this.state.messages;
+  }
+
+
+  resetState(){
+    this.patrolPut();
+    this.coordPut();
+    this.disconnectSocket();
+    this.guardPut(0);
+    this.set('coordSeq', 1);
   }
 
 }
