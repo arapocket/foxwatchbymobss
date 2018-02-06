@@ -110,9 +110,6 @@ class HomeView extends React.Component {
 
   componentDidMount() {
 
-    //  console.log("componentDidMount called");
-    //AppState.addEventListener('change', this.onAppStateChange.bind(this));
-
     this.authService.set('enabled', false);
 
     BackgroundFetch.configure({
@@ -166,14 +163,11 @@ class HomeView extends React.Component {
     fetch('http://ec2-34-210-155-178.us-west-2.compute.amazonaws.com:3000/currentroutes/' + this.idService.getCurrentGuardID())
       .then(res => res.json())
       .then(json => {
-        //  console.log('logging json');
-        //  console.log(json);
 
         //create a polyline for each of these
         this.loadCurrentCheckpoints(json[0].RouteID);
       }
       ).catch(err => {
-        // console.log(err);
       });
   }
 
@@ -182,8 +176,7 @@ class HomeView extends React.Component {
     fetch('http://ec2-34-210-155-178.us-west-2.compute.amazonaws.com:3000/checkpoints/' + routeID)
       .then(res => res.json())
       .then(json => {
-        //  console.log('logging checkpoints GET json');
-        //  console.log(json);
+
 
         this.setState({
           checkpoints: [],
@@ -207,7 +200,6 @@ class HomeView extends React.Component {
 
       }
       ).catch(err => {
-        // console.log(err);
       });
 
   }
@@ -293,8 +285,6 @@ class HomeView extends React.Component {
 
   onClickEnable() {
 
-    console.log('logging authService enabled: ' + this.authService.isEnabled())
-
     let enabled = !this.authService.isEnabled();
 
 
@@ -317,7 +307,6 @@ class HomeView extends React.Component {
           this.setState({ isResettingOdometer: false });
         });
         this.setState({ showsUserLocation: true });
-        //  console.log('- Start success: ', state);
 
         bgGeo.changePace(true, (state) => {
 
@@ -336,7 +325,6 @@ class HomeView extends React.Component {
       this.authService.resetState();
 
       bgGeo.stop(() => {
-        //  console.log('- stopped');
       });
       this.setState({
         coordinates: [],
@@ -405,7 +393,6 @@ class HomeView extends React.Component {
     config.notificationLargeIcon = 'drawable/notification_large_icon';
 
     bgGeo.getSensors((sensors) => {
-      //  console.log('[js] sensors: ', JSON.stringify(sensors, null, 2));
     });
 
     bgGeo.isPowerSaveMode((isPowerSaveMode) => {
@@ -413,7 +400,6 @@ class HomeView extends React.Component {
     });
 
     bgGeo.configure(config, (state) => {
-      //  console.log('- configure success.  Current state: ', state);
 
       // Broadcast to child components.
       eventEmitter.emit('enabled', enabled);
@@ -444,7 +430,6 @@ class HomeView extends React.Component {
 
   onMotionChange(event) {
     var location = event.location;
-    //  console.log("- motionchange", JSON.stringify(event));
     if (event.isMoving) {
       if (this.lastMotionChangeLocation) {
         this.setState({
@@ -473,7 +458,9 @@ class HomeView extends React.Component {
   }
 
   onLocation(location) {
-    //  console.log('- location: ', JSON.stringify(location));
+
+    console.log('onLocation called');
+
     if (!location.sample) {
 
       if (this.locationIsAccurate(location)) {
@@ -509,7 +496,6 @@ class HomeView extends React.Component {
 
     let coords = this.state.coordinates;
 
-    console.log(coords);
 
     if (coords.length > 0) {
 
@@ -525,12 +511,6 @@ class HomeView extends React.Component {
         (location.coords.longitude - lastLocation.longitude)
       )
 
-      console.log('logging location.long ' + location.coords.longitude);
-      console.log('logging lastLocation.long ' + lastLocation.longitude)
-
-
-      console.log('logging deltaLatitude: ' + deltaLatitude)
-
       if (
         (
           (deltaLatitude < maxDelta) &&
@@ -538,12 +518,11 @@ class HomeView extends React.Component {
       ) {
         return true;
       } else {
-        console.log('locationis not accurate');
+        console.log('location is not accurate');
         return false;
       }
 
     } else {
-      console.log('true returned');
       return true;
     }
 
@@ -552,23 +531,18 @@ class HomeView extends React.Component {
 
   onPowerSaveChange(isPowerSaveMode) {
     // Show red side-border bars on map when in low-power mode.
-    //  console.log('- powersavechange: ', isPowerSaveMode);
     this.setState({
       containerBorderWidth: (isPowerSaveMode) ? 5 : 0
     });
   }
 
   onHeartbeat(params) {
-    //  console.log("- heartbeat: ", params.location);
   }
 
   onHttp(response) {
-    //  console.log('- http ' + response.status);
-    //  console.log(response.responseText);
   }
 
   onSchedule(state) {
-    //  console.log("- schedule", state.enabled, state);
     this.authService.set('enabled', this.authService.isEnabled());
   }
 
@@ -736,7 +710,6 @@ class HomeView extends React.Component {
       passProps: {}, // simple serializable object that will pass as props to the modal (optional)
       animationType: 'slide-up' // 'none' / 'slide-up' , appear animation for the modal (optional, default 'slide-up')
     });
-    //  console.log("onPressIncidentButton called");
   }
 
   chatButton() {
@@ -762,7 +735,6 @@ class HomeView extends React.Component {
       passProps: {}, // simple serializable object that will pass as props to the modal (optional)
       animationType: 'slide-up' // 'none' / 'slide-up' , appear animation for the modal (optional, default 'slide-up')
     });
-    //  console.log("onPressIncidentButton called");
   }
 
   optionsButton() {

@@ -14,6 +14,7 @@ import Toast from 'react-native-root-toast';
 import { EventRegister } from 'react-native-event-listeners'
 import EventEmitter from 'EventEmitter';
 
+import BGService from '../lib/BGService';
 import IDService from '../lib/IDService';
 import PatrolService from '../lib/PatrolService';
 
@@ -48,9 +49,10 @@ class AuthService extends React.Component {
       messages: []
     };
 
+    this.bgService = BGService.getInstance();
     this.idService = IDService.getInstance();
     this.patrolService = PatrolService.getInstance();
-
+    var bgGeo = this.bgService.getPlugin();
 
     this._loadState();
 
@@ -69,6 +71,14 @@ class AuthService extends React.Component {
       console.log('log out heard ');
       this.resetState();
       this.idService.resetState();
+      bgGeo.stop(() => {
+
+      });
+
+      bgGeo.removeAllListeners();
+
+      this.bgService.removeListeners();
+
     })
 
 
@@ -342,6 +352,9 @@ class AuthService extends React.Component {
   }
 
   coordPut() {
+
+    console.log('coordPut called');
+
     fetch('http://ec2-34-210-155-178.us-west-2.compute.amazonaws.com:3000/coordinates', {
       method: 'PUT',
       headers: {
@@ -353,16 +366,15 @@ class AuthService extends React.Component {
         CurrentCoord: 0
       })
     }).then((response) => {
-      console.log("logging coordPut response");
-      console.log(response);
+      // console.log("logging coordPut response");
+      // console.log(response);
 
     })
   }
 
   coordPut(location) {
 
-    console.log('logging current guardID from coordPut')
-    console.log(this.idService.getCurrentGuardID());
+    console.log('coordPut(location) called');
 
     fetch('http://ec2-34-210-155-178.us-west-2.compute.amazonaws.com:3000/coordinates', {
       method: 'PUT',
@@ -375,14 +387,15 @@ class AuthService extends React.Component {
         CurrentCoord: 0
       })
     }).then((response) => {
-      console.log("logging coordPut(location) response");
-      console.log(response);
       this.coordPost(location);
 
     })
   }
 
   coordPost(location) {
+
+    console.log('coordPost called');
+
     this.idService.createCoordID();
 
     fetch('http://ec2-34-210-155-178.us-west-2.compute.amazonaws.com:3000/coordinates', {
@@ -400,8 +413,6 @@ class AuthService extends React.Component {
         CurrentCoord: 1
       })
     }).then((response) => {
-      console.log("logging coordPost response");
-      console.log(response);
       this.patrolService.set('currentLat', location.coords.latitude);
       this.patrolService.set('currentLng', location.coords.longitude);
     })
@@ -409,17 +420,13 @@ class AuthService extends React.Component {
   }
 
   incrementCoordSequence() {
-    console.log('incrementCoordSequence called');
-    console.log('logging state: ' + JSON.stringify(this.state));
-    console.log('coordSeq: ' + this.state.coordSeq);
+
 
     let coordSeq = this.state.coordSeq;
     coordSeq += 1;
     this.set('coordSeq', coordSeq);
   }
 
-
-  ////GET FUNCTIONS FOR THIS STATE'S PROPERTIES
 
   getMessages() {
     return this.state.messages;
