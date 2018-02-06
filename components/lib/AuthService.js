@@ -439,6 +439,7 @@ class AuthService extends React.Component {
     this.disconnectSocket();
     this.guardPut(0);
     this.set('coordSeq', 1);
+    this.set('enabled', false);
   }
 
 }

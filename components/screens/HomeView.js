@@ -140,7 +140,7 @@ class HomeView extends React.Component {
     this.bgService.on('change', this.onBackgroundGeolocationChanged.bind(this));
 
     this.stopListener = EventRegister.addEventListener('patrol stop', (data) => {
-      this.onClickEnable();
+      this.stopPatrol();
     })
 
     this.checkpointAddListener = EventRegister.addEventListener('checkpoint add', (data) => {
@@ -321,28 +321,35 @@ class HomeView extends React.Component {
       });
 
     } else {
-      this.setState({ showsUserLocation: false });
-      this.authService.resetState();
-
-      bgGeo.stop(() => {
-      });
-      this.setState({
-        coordinates: [],
-        markers: [],
-        stationaryRadius: 0,
-        stationaryLocation: {
-          timestamp: '',
-          latitude: 0,
-          longitude: 0
-        },
-        stopZones: [],
-      });
+      this.stopPatrol();
     }
 
     this.authService.set('enabled', enabled);
 
     // Transmit to other components
     eventEmitter.emit('enabled', enabled);
+  }
+
+  stopPatrol(){
+
+    let bgGeo = this.bgService.getPlugin();
+
+    this.setState({ showsUserLocation: false });
+    this.authService.resetState();
+
+    bgGeo.stop(() => {
+    });
+    this.setState({
+      coordinates: [],
+      markers: [],
+      stationaryRadius: 0,
+      stationaryLocation: {
+        timestamp: '',
+        latitude: 0,
+        longitude: 0
+      },
+      stopZones: [],
+    });
   }
 
   configureBackgroundGeolocation(config) {
