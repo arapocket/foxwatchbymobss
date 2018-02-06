@@ -10,6 +10,7 @@ import EventEmitter from 'EventEmitter';
 const STORAGE_KEY = "IDService";
 let instance = null;
 let eventEmitter = new EventEmitter();
+import { EventRegister } from 'react-native-event-listeners'
 
 class IDService {
 
@@ -35,6 +36,8 @@ class IDService {
             currentGuardLastName: ''
         };
         this._loadState();
+
+
 
     }
 
@@ -169,9 +172,19 @@ class IDService {
             ).catch(err => {
                 // console.log(err);
             });
+    }
 
+    resetState(){
 
-
+        this.set('currentGuardID', '');
+        this.set('currentPatrolID', '');
+        this.set('currentCoordID', '');
+        this.set('currentRouteID', '');
+        this.set('currentCheckpointID', '');
+        this.set('currentIncidentID', '');
+        this.set('currentGuardLocationID', '');
+        this.set('currentGuardFirstName', '');
+        this.set('currentGuardLastName', '');
     }
 
 }

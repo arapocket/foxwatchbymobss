@@ -39,14 +39,12 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Foxwatch needs to use your camera for incident reporting.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>CHANGEME: Location Always And When In Use Usage Description</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>CHANGEME: Location Always Usage Description</string>
+	<string>Foxwatch needs to use your location to track your patrol.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSMotionUsageDescription</key>
-	<string>CHANGEME: Motion updates increase battery efficiency by intelligently toggling location-services when device is detected to be moving</string>
+	<string>Foxwatch waits for changes in your motion to resume location tracking.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string></string>
 	<key>NSPhotoLibraryUsageDescription</key>

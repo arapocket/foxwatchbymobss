@@ -1,6 +1,6 @@
 'use strict';
 
-// import './ReactotronConfig'
+import './ReactotronConfig'
 
 import React, { Component } from 'react';
 import {

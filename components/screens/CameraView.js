@@ -124,6 +124,7 @@ class CameraView extends React.Component {
         //options.location = ...
         this.camera.capture({ metadata: options })
             .then((data) => {
+                this.patrolService.setMediaType('photo');
                 console.log("logging path");
                 console.log(data.path);
                 // this.refs.modal.close();

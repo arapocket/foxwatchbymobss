@@ -76,9 +76,6 @@ class IncidentView extends React.Component {
       animated: true // does the toggle have transition animation or does it happen immediately (optional). By default animated: true
     });
 
-
-    this.uploadMedia = this.uploadMedia.bind(this);
-
   }
 
 
@@ -206,7 +203,6 @@ class IncidentView extends React.Component {
 
   }
 
-
   onPressPhotoButton() {
 
     this.bgService.playSound('OPEN');
@@ -261,6 +257,10 @@ class IncidentView extends React.Component {
 
   onPressSubmitButton() {
 
+    console.log('logging mediaType from onPressSubmitButton: ' + this.patrolService.getMediaType())
+    let mediaType = this.patrolService.getMediaType();
+    
+
     this.idService.createIncidentID();
 
     var description = this.state.description;
@@ -287,10 +287,12 @@ class IncidentView extends React.Component {
         Type: incidentType,
         lat: this.state.patrolData.currentLat,
         lng: this.state.patrolData.currentLng,
-        PatrolID: this.idService.getCurrentPatrolID()
+        PatrolID: this.idService.getCurrentPatrolID(),
+        Media: mediaType        
 
       })
     }).then((response) => {
+      console.log('logging media type: ' + this.patrolService.getMediaType());
       console.log("logging incident post response");
       console.log(response);
       this.props.navigator.dismissModal({
@@ -308,9 +310,6 @@ class IncidentView extends React.Component {
 
     let mediaPath = this.state.patrolData.mediaPath;
 
-    // console.log('logging mediaPath');
-    // console.log(mediaPath);
-
     if (mediaPath != undefined && mediaPath != '' && mediaPath != null) {
 
       if (mediaPath.includes('.mov')) {
@@ -319,24 +318,12 @@ class IncidentView extends React.Component {
 
         var media = <Video style={styles.incidentMedia} source={{ uri: mediaPath }} volume={1.0} repeat={true} />
 
-        // console.log('logging the video media');
-        // console.log(media);
-
       } else {
         var media = <Image style={styles.incidentMedia} source={{ uri: mediaPath }} />
 
-        // console.log('logging the image media');
-        // console.log(media);
-
       }
 
-
-
     } else {
-      // console.log('else of incidentImage called');
-      // var media = <Image
-      //   style={styles.incidentMedia}
-      //   source={require('../../images/scarface.jpg')} />
     }
 
     return (
@@ -378,8 +365,15 @@ class IncidentView extends React.Component {
 
   sendFile(fileName, presignedUrl) {
 
+    let mediaPath = this.patrolService.getMediaPath();
+
+
     console.log('logging media path inside sendFile()');
-    if (this.patrolService.getMediaPath() != '') {
+    console.log(mediaPath);
+
+
+
+    if (mediaPath.length > 0 && mediaPath != undefined && mediaPath != null ) {
 
       var filePath = 'file://' + this.patrolService.getMediaPath();
 
@@ -401,9 +395,6 @@ class IncidentView extends React.Component {
       });
 
     }
-
-
-
 
   }
 

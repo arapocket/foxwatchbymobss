@@ -72,6 +72,8 @@ class AuthService extends React.Component {
       this.coordPut();
       this.disconnectSocket();
       this.guardPut(0);
+      this.set('coordSeq', 1);
+      this.idService.resetState();
     })
 
 
@@ -186,7 +188,6 @@ class AuthService extends React.Component {
     });
   }
 
-
   connectToSocket() {
 
     this.getIDData();
@@ -234,7 +235,7 @@ class AuthService extends React.Component {
     socket.on('user left', function (user) {
       console.log('socket.on userleft called');
       self.toast(user.username + ' left.');
-      
+
     });
 
   }
@@ -282,7 +283,6 @@ class AuthService extends React.Component {
     });
   }
 
-
   guardPut(loggedIn) {
 
     console.log('guardPut called');
@@ -305,7 +305,6 @@ class AuthService extends React.Component {
     })
 
   }
-
 
   patrolPost() {
 
@@ -346,7 +345,6 @@ class AuthService extends React.Component {
       //  console.log(response);
     })
   }
-
 
   coordPut() {
     fetch('http://ec2-34-210-155-178.us-west-2.compute.amazonaws.com:3000/coordinates', {
@@ -389,7 +387,6 @@ class AuthService extends React.Component {
     })
   }
 
-
   coordPost(location) {
     this.idService.createCoordID();
 
@@ -416,7 +413,6 @@ class AuthService extends React.Component {
 
   }
 
-
   incrementCoordSequence() {
     console.log('incrementCoordSequence called');
     console.log('logging state: ' + JSON.stringify(this.state));
@@ -430,9 +426,9 @@ class AuthService extends React.Component {
 
   ////GET FUNCTIONS FOR THIS STATE'S PROPERTIES
 
-getMessages(){
-  return this.state.messages;
-}
+  getMessages() {
+    return this.state.messages;
+  }
 
 }
 

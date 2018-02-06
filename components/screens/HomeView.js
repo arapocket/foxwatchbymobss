@@ -315,6 +315,7 @@ class HomeView extends React.Component {
       this.authService.patrolPost();
       this.authService.connectToSocket();
       this.authService.startPushNotifications();
+      this.patrolService.resetState();
       this.loadCurrentRoutes();
 
       if (this.bgService.isLocationTrackingMode()) {

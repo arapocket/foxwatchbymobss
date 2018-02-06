@@ -135,7 +135,7 @@ class VideoView extends React.Component {
 
             this.camera.capture({ metadata: options })
             .then((data) => {
-
+                this.patrolService.setMediaType('video');
                 console.log(data);
 
                 console.log("logging path");

@@ -71,20 +71,16 @@ class PatrolService extends React.Component {
                 rendering_markers: 'Rendering markers...'
             },
             mediaPath: '',
+            mediaType: 'none',
             currentLat: 0,
             currentLng: 0,
             idData: {
-
             },
-            messages: []
-
-
+            messages: [],
+            
         };
         this._loadState();
     }
-
-
-
 
     getState(callback) {
         if (this.state) {
@@ -142,9 +138,25 @@ class PatrolService extends React.Component {
     }
 
     getMediaPath(){
+        console.log('logging mediaPath from getMediaPath' )
+        console.log(this.state.mediaPath);
         return this.state.mediaPath;
     }
 
+    setMediaType(mediaType){
+        this.set('mediaType', mediaType)
+    }
+
+    getMediaType(){
+        console.log('logging state from getMediaType' )
+        console.log(this.state);
+        return this.state.mediaType;
+    }
+    
+    resetState(){
+        this.setMediaType('none');
+        this.setMediaPath('');
+    }
 
 
 
