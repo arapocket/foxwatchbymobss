@@ -480,6 +480,18 @@ class HomeView extends React.Component {
         this.addMarker(location);
         this.authService.incrementCoordSequence();
         this.authService.coordPut(location);
+      } else {
+
+        let coords = [];
+        let markers = [];
+        coords.push(this.state.coordinates);
+        markers.push(this.state.markers);
+        coords.splice(coords[coords.length-1], 1);
+        markers.splice(coords[coords.length-1], 1);
+        this.setState({
+          coordinates: coords,
+          markers: markers
+        })
       }
 
     }
@@ -493,46 +505,47 @@ class HomeView extends React.Component {
 
   locationIsAccurate(location) {
 
-    return true;
+    // return true;
 
-    // let coords = this.state.coordinates;
+    let coords = this.state.coordinates;
 
-    // console.log(coords);
+    console.log(coords);
 
-    // if (coords.length > 0) {
+    if (coords.length > 0) {
 
-    //   let lastLocation = coords[coords.length - 1];
+      let lastLocation = coords[coords.length - 1];
 
-    //   let maxDelta = 0.001;
+      let maxDelta = 0.0007;
 
-    //   let deltaLatitude = Math.abs(
-    //     (location.coords.latitude - lastLocation.latitude)
-    //   )
+      let deltaLatitude = Math.abs(
+        (location.coords.latitude - lastLocation.latitude)
+      )
 
-    //   let deltaLongitude = Math.abs(
-    //     (location.coords.longitude - lastLocation.longitude)
-    //   )
+      let deltaLongitude = Math.abs(
+        (location.coords.longitude - lastLocation.longitude)
+      )
 
-    //   console.log('logging location.long ' + location.coords.longitude);
-    //   console.log('logging lastLocation.long ' + lastLocation.longitude)
+      console.log('logging location.long ' + location.coords.longitude);
+      console.log('logging lastLocation.long ' + lastLocation.longitude)
 
 
-    //   console.log('logging deltaLatitude: ' + deltaLatitude)
+      console.log('logging deltaLatitude: ' + deltaLatitude)
 
-    //   if (
-    //     (
-    //       (deltaLatitude < maxDelta) &&
-    //       (deltaLongitude < maxDelta))
-    //   ) {
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
+      if (
+        (
+          (deltaLatitude < maxDelta) &&
+          (deltaLongitude < maxDelta))
+      ) {
+        return true;
+      } else {
+        console.log('locationis not accurate');
+        return false;
+      }
 
-    // } else {
-    //   console.log('true returned');
-    //   return true;
-    // }
+    } else {
+      console.log('true returned');
+      return true;
+    }
 
   }
 
@@ -798,6 +811,7 @@ class HomeView extends React.Component {
           showsTraffic={false}
           toolbarEnabled={false}
           mapType="satellite"
+          loadingEnabled = {true}
         >
           <MapView.Circle
             key={this.state.stationaryLocation.timestamp}
