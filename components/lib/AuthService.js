@@ -275,6 +275,10 @@ class AuthService extends React.Component {
     socket.disconnect();
   }
 
+  restartSocket(){
+
+  }
+
   toast(message, param, duration) {
     duration = duration || 'LONG';
     // Add a Toast on screen.
