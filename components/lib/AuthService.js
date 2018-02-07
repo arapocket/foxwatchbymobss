@@ -243,6 +243,12 @@ class AuthService extends React.Component {
 
     });
 
+    this.idService.createPatrolID();
+
+    socket.emit('patrol start', {
+      PatrolID: this.idService.getCurrentPatrolID(),
+      GuardID: this.idService.getCurrentGuardID()
+    });
   }
 
   emitMessage(msg) {
@@ -273,10 +279,6 @@ class AuthService extends React.Component {
 
   disconnectSocket() {
     socket.disconnect();
-  }
-
-  restartSocket(){
-
   }
 
   toast(message, param, duration) {
@@ -339,20 +341,27 @@ class AuthService extends React.Component {
   }
 
   patrolPut() {
-    fetch('http://ec2-34-210-155-178.us-west-2.compute.amazonaws.com:3000/patrols', {
-      method: 'PUT',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        GuardID: this.idService.getCurrentGuardID(),
-        CurrentPatrol: 0
-      })
-    }).then((response) => {
-      //  console.log("logging patrolPut response");
-      //  console.log(response);
-    })
+
+
+    socket.emit('ended patrol', {
+      GuardID: this.idService.getCurrentGuardID(),
+      CurrentPatrol: 0
+    });
+
+    // fetch('http://ec2-34-210-155-178.us-west-2.compute.amazonaws.com:3000/patrols', {
+    //   method: 'PUT',
+    //   headers: {
+    //     'Accept': 'application/json',
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     GuardID: this.idService.getCurrentGuardID(),
+    //     CurrentPatrol: 0
+    //   })
+    // }).then((response) => {
+    //   //  console.log("logging patrolPut response");
+    //   //  console.log(response);
+    // })
   }
 
   coordPut() {

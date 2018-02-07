@@ -224,7 +224,6 @@ class HomeView extends React.Component {
     });
   }
 
-
   onBackgroundGeolocationChanged(name, value) {
     let bgGeo = this.state.bgGeo;
     bgGeo[name] = value;
@@ -293,7 +292,7 @@ class HomeView extends React.Component {
 
     if (enabled) {
 
-      this.authService.patrolPost();
+      // this.authService.patrolPost();
       this.authService.connectToSocket();
       this.authService.startPushNotifications();
       this.patrolService.resetState();
@@ -508,7 +507,7 @@ class HomeView extends React.Component {
 
       let lastLocation = coords[coords.length - 1];
 
-      let maxDelta = 0.0007;
+      let maxDelta = 0.0002;
 
       let deltaLatitude = Math.abs(
         (location.coords.latitude - lastLocation.latitude)
