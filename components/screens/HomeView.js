@@ -475,6 +475,9 @@ class HomeView extends React.Component {
         this.authService.coordPut(location);
       } else {
 
+        // this.patrolService.setCoords(coords);
+        // this.authService.coordDelete(this.idService.getCurrentPatrolID());
+
         let coords = [];
         let markers = [];
         coords.push(this.state.coordinates);
@@ -495,7 +498,6 @@ class HomeView extends React.Component {
 
   }
 
-
   locationIsAccurate(location) {
 
     // return true;
@@ -507,7 +509,7 @@ class HomeView extends React.Component {
 
       let lastLocation = coords[coords.length - 1];
 
-      let maxDelta = 0.0002;
+      let maxDelta = 0.0001;
 
       let deltaLatitude = Math.abs(
         (location.coords.latitude - lastLocation.latitude)

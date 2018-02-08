@@ -77,6 +77,7 @@ class PatrolService extends React.Component {
             idData: {
             },
             messages: [],
+            coords: []
             
         };
         this._loadState();
@@ -151,6 +152,14 @@ class PatrolService extends React.Component {
         console.log('logging state from getMediaType' )
         console.log(this.state);
         return this.state.mediaType;
+    }
+
+    getCoords(){
+        return this.state.coords;
+    }
+
+    setCoords(coords){
+        this.set('coords', coords)
     }
     
     resetState(){

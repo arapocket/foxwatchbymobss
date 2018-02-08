@@ -37,6 +37,7 @@ class AuthService extends React.Component {
     }
     return instance;
   }
+
   constructor(props) {
 
     super(props);
@@ -88,7 +89,6 @@ class AuthService extends React.Component {
 
   }
 
-
   isEnabled() {
     return this.state.enabled;
   }
@@ -100,7 +100,6 @@ class AuthService extends React.Component {
       this._loadState(callback);
     }
   }
-
 
   set(name, value) {
     if (this.state[name] === value) {
@@ -401,7 +400,6 @@ class AuthService extends React.Component {
       })
     }).then((response) => {
       this.coordPost(location);
-
     })
   }
 
@@ -429,6 +427,29 @@ class AuthService extends React.Component {
       this.patrolService.set('currentLat', location.coords.latitude);
       this.patrolService.set('currentLng', location.coords.longitude);
     })
+
+  }
+
+  coordDelete(patrolID){
+
+    fetch('http://ec2-34-210-155-178.us-west-2.compute.amazonaws.com:3000/coordinates/' + patrolID, {
+      method: 'DELETE',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      }
+    }).then((response) => {
+      this.postAccuratePatrol();
+    })
+  }
+
+  postAccuratePatrol(){
+    let coords = this.patrolService.getCoords();
+
+    for (i = 0 ; i < coords.length ; i++)
+    {
+      coordPost(coords[i]);
+    }
 
   }
 
