@@ -259,7 +259,7 @@ class IncidentView extends React.Component {
 
     console.log('logging mediaType from onPressSubmitButton: ' + this.patrolService.getMediaType())
     let mediaType = this.patrolService.getMediaType();
-    
+
 
     this.idService.createIncidentID();
 
@@ -288,7 +288,7 @@ class IncidentView extends React.Component {
         lat: this.state.patrolData.currentLat,
         lng: this.state.patrolData.currentLng,
         PatrolID: this.idService.getCurrentPatrolID(),
-        Media: mediaType        
+        Media: mediaType
 
       })
     }).then((response) => {
@@ -336,7 +336,6 @@ class IncidentView extends React.Component {
   uploadMedia() {
     var fileName = this.state.idData.currentIncidentID;
     this.fetchPresignUrl(fileName);
-
   }
 
   fetchPresignUrl(fileName) {
@@ -373,7 +372,7 @@ class IncidentView extends React.Component {
 
 
 
-    if (mediaPath.length > 0 && mediaPath != undefined && mediaPath != null ) {
+    if (mediaPath.length > 0 && mediaPath != undefined && mediaPath != null) {
 
       var filePath = 'file://' + this.patrolService.getMediaPath();
 
